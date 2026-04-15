@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0F6E56"/>
+<title>HealthCoach AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#1D9E75;--gl:#E1F5EE;--gd:#085041;
+  --b:#378ADD;--bl:#E6F1FB;--bd:#0C447C;
+  --a:#EF9F27;--al:#FAEEDA;--ad:#633806;
+  --c:#D85A30;--cl:#FAECE7;--cd:#712B13;
+  --p:#7F77DD;--pl:#EEEDFE;--pd:#3C3489;
+  --pk:#D4537E;--pkl:#FBEAF0;--pkd:#72243E;
+  --bg:#f7f8fa;--card:#fff;--txt:#111;--txt2:#777;--brd:rgba(0,0,0,.08);
+  --fn:'Nunito',sans-serif;
+}
+body{font-family:var(--fn);background:var(--bg);min-height:100vh;color:var(--txt);}
+.app{max-width:430px;margin:0 auto;padding-bottom:76px;min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#0F6E56 0%,#185FA5 100%);border-radius:0 0 28px 28px;padding:20px 18px 24px;color:white;}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.hdr-sub{font-size:12px;opacity:.75;font-weight:700;}
+.hdr-name{font-size:21px;font-weight:900;}
+.avi{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;}
+.score-row{display:flex;align-items:center;gap:14px;}
+.ring-wrap{position:relative;width:70px;height:70px;flex-shrink:0;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;font-weight:900;}
+.score-info .pts{font-size:25px;font-weight:900;}
+.score-info .sub{font-size:12px;opacity:.75;font-weight:600;}
+.streak{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;margin-top:6px;}
+
+/* TABS */
+.tabs{display:flex;gap:6px;padding:14px 14px 4px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-family:var(--fn);font-size:12px;font-weight:800;white-space:nowrap;background:#e8e8e8;color:#888;transition:all .2s;flex-shrink:0;}
+.tab.on{background:linear-gradient(135deg,#0F6E56,#185FA5);color:white;}
+
+/* PAGES */
+.pg{display:none;padding:10px 14px 20px;}
+.pg.on{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:18px;border:.5px solid var(--brd);padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.card-title{font-size:13px;font-weight:900;}
+.pill{font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;}
+.pill.g{background:var(--gl);color:var(--gd);}
+.pill.b{background:var(--bl);color:var(--bd);}
+.pill.a{background:var(--al);color:var(--ad);}
+.pill.p{background:var(--pl);color:var(--pd);}
+.pill.c{background:var(--cl);color:var(--cd);}
+.pill.pk{background:var(--pkl);color:var(--pkd);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat{border-radius:14px;padding:13px;cursor:pointer;}
+.stat.g{background:var(--gl);}
+.stat.b{background:var(--bl);}
+.stat.a{background:var(--al);}
+.stat.c{background:var(--cl);}
+.stat.p{background:var(--pl);}
+.stat.pk{background:var(--pkl);}
+.stat-ico{font-size:20px;margin-bottom:5px;}
+.stat-lbl{font-size:10px;font-weight:800;opacity:.55;text-transform:uppercase;letter-spacing:.4px;color:#333;}
+.stat-val{font-size:21px;font-weight:900;line-height:1.1;}
+.stat-val.g{color:var(--gd);}
+.stat-val.b{color:var(--bd);}
+.stat-val.a{color:var(--ad);}
+.stat-val.c{color:var(--cd);}
+.stat-val.p{color:var(--pd);}
+.stat-val.pk{color:var(--pkd);}
+.stat-unit{font-size:11px;font-weight:700;opacity:.6;}
+.prog{height:4px;border-radius:2px;background:rgba(0,0,0,.1);margin-top:6px;}
+.prog-fill{height:100%;border-radius:2px;}
+.prog-fill.g{background:var(--g);}
+.prog-fill.b{background:var(--b);}
+.prog-fill.a{background:var(--a);}
+.prog-fill.c{background:var(--c);}
+.prog-fill.p{background:var(--p);}
+.prog-fill.pk{background:var(--pk);}
+
+/* MOOD */
+.mood-row{display:flex;gap:6px;justify-content:space-around;}
+.mood-opt{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 6px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:#f0f0f0;transition:all .2s;font-size:22px;}
+.mood-opt.on{border-color:var(--g);background:var(--gl);}
+.mood-lbl{font-size:9px;font-weight:800;color:#888;}
+
+/* CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:65px;margin:10px 0 4px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{width:100%;border-radius:5px 5px 2px 2px;}
+.bar-day{font-size:9px;font-weight:800;color:#bbb;}
+.bar-day.td{color:var(--g);}
+
+/* AI COACH */
+.coach-wrap{border-radius:18px;overflow:hidden;border:.5px solid var(--brd);box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.coach-hdr{background:linear-gradient(135deg,#0F6E56,#185FA5);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+.coach-avi{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.coach-hdr .nm{color:white;font-size:13px;font-weight:900;}
+.coach-hdr .st{color:rgba(255,255,255,.7);font-size:10px;font-weight:700;}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:3px;}
+.msgs{min-height:240px;max-height:340px;overflow-y:auto;padding:14px;background:#f4f6f8;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:84%;padding:10px 14px;border-radius:16px;font-size:13px;font-weight:600;line-height:1.55;}
+.msg.ai{background:white;border:.5px solid rgba(0,0,0,.07);color:#111;align-self:flex-start;border-bottom-left-radius:4px;}
+.msg.user{background:linear-gradient(135deg,#0F6E56,#185FA5);color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg.typing{background:white;border:.5px solid rgba(0,0,0,.07);align-self:flex-start;padding:12px 16px;}
+.typing-dots{display:flex;gap:4px;}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:#aaa;animation:bounce .9s infinite;}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+.qp-row{display:flex;gap:5px;flex-wrap:wrap;padding:8px 12px;background:#eef0f3;}
+.qp-btn{padding:6px 11px;border-radius:20px;border:1px solid rgba(0,0,0,.1);background:white;font-family:var(--fn);font-size:11px;font-weight:800;color:var(--gd);cursor:pointer;}
+.coach-inp-row{display:flex;gap:8px;padding:10px 12px;background:white;border-top:.5px solid rgba(0,0,0,.07);}
+.coach-inp{flex:1;padding:10px 14px;border-radius:20px;border:1.5px solid #e0e0e0;font-family:var(--fn);font-size:13px;font-weight:600;background:#f4f6f8;color:#111;outline:none;}
+.coach-inp:focus{border-color:var(--g);}
+.send-btn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--g),var(--b));color:white;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* BMR */
+.bmr-inputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.field-wrap{display:flex;flex-direction:column;gap:4px;}
+.field-lbl{font-size:11px;font-weight:800;color:#888;}
+.field-inp{padding:10px 12px;border-radius:10px;border:1.5px solid #e0e0e0;font-family:var(--fn);font-size:14px;font-weight:700;background:#f4f6f8;color:#111;outline:none;width:100%;}
+.field-inp:focus{border-color:var(--g);}
+.field-sel{padding:10px 12px;border-radius:10px;border:1.5px solid #e0e0e0;font-family:var(--fn);font-size:13px;font-weight:700;background:#f4f6f8;color:#111;outline:none;width:100%;cursor:pointer;}
+.bmr-result{border-radius:14px;padding:16px;background:var(--gl);text-align:center;margin:12px 0 10px;}
+.bmr-num{font-size:42px;font-weight:900;color:var(--gd);}
+.bmr-sub{font-size:12px;color:var(--gd);font-weight:700;opacity:.7;}
+.bmr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+.bmr-cell{background:white;border-radius:10px;padding:9px;text-align:center;}
+.bmr-cell-val{font-size:14px;font-weight:900;color:var(--gd);}
+.bmr-cell-lbl{font-size:10px;color:#999;font-weight:700;}
+.calc-btn{width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--g),var(--b));color:white;font-family:var(--fn);font-size:14px;font-weight:900;}
+
+/* WATER */
+.cups{display:flex;gap:5px;flex-wrap:wrap;}
+.cup{width:34px;height:40px;border-radius:3px 3px 8px 8px;border:2.5px solid var(--b);cursor:pointer;transition:all .2s;background:transparent;}
+.cup.on{background:var(--b);}
+
+/* ACTIVITY */
+.act-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:.5px solid rgba(0,0,0,.06);}
+.act-item:last-child{border:none;}
+.act-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.act-name{font-size:13px;font-weight:800;}
+.act-detail{font-size:11px;color:#999;font-weight:600;}
+.act-cal{font-size:12px;font-weight:900;color:var(--cd);margin-left:auto;flex-shrink:0;}
+
+/* INPUT ROW */
+.inp-row{display:flex;gap:6px;margin-top:10px;}
+.inp-row input{flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid #e0e0e0;font-family:var(--fn);font-size:13px;font-weight:600;background:#f4f6f8;color:#111;outline:none;}
+.inp-row input:focus{border-color:var(--g);}
+.add-btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--g),var(--b));color:white;font-family:var(--fn);font-size:12px;font-weight:900;}
+
+/* SLEEP */
+.sleep-stages{display:flex;gap:6px;}
+.stage{flex:1;text-align:center;padding:9px 4px;border-radius:10px;}
+.stage-val{font-size:14px;font-weight:900;}
+.stage-lbl{font-size:10px;font-weight:700;opacity:.65;}
+
+/* REMINDERS */
+.reminder{display:flex;align-items:center;gap:10px;padding:11px;border-radius:12px;background:#f4f6f8;margin-bottom:7px;}
+.rem-ico{font-size:20px;flex-shrink:0;}
+.rem-title{font-size:13px;font-weight:800;}
+.rem-time{font-size:11px;color:#999;font-weight:600;}
+.rem-tog{margin-left:auto;width:40px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
+.rem-tog.on{background:var(--g);}
+.rem-tog.off{background:#ccc;}
+.rem-tog::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:2px;transition:left .2s;}
+.rem-tog.on::after{left:20px;}
+.rem-tog.off::after{left:2px;}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:white;border-top:.5px solid rgba(0,0,0,.1);display:flex;padding:8px 0 env(safe-area-inset-bottom,6px);z-index:100;}
+.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px 0;font-family:var(--fn);font-size:9px;font-weight:800;color:#bbb;transition:color .2s;}
+.bnav-btn.on{color:var(--g);}
+.bnav-ico{font-size:21px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-sub" id="greeting">Chào buổi sáng 🌤️</div>
+      <div class="hdr-name">Sẵn sàng chưa anh? 💪</div>
+    </div>
+    <div class="avi">A</div>
+  </div>
+  <div class="score-row">
+    <div class="ring-wrap">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7"/>
+        <circle cx="35" cy="35" r="28" fill="none" stroke="white" stroke-width="7"
+          stroke-dasharray="175.9" stroke-dashoffset="35" stroke-linecap="round"/>
+      </svg>
+      <div class="ring-center">80</div>
+    </div>
+    <div class="score-info">
+      <div style="font-size:12px;opacity:.75;font-weight:700;">Điểm sức khoẻ hôm nay</div>
+      <div class="pts">80 / 100</div>
+      <div class="sub">Tốt! Hãy duy trì nhé</div>
+      <div class="streak">🔥 7 ngày liên tiếp</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab on" onclick="go('home')">🏠 Tổng quan</button>
+  <button class="tab" onclick="go('coach')">🤖 AI Coach</button>
+  <button class="tab" onclick="go('bmr')">🔢 BMR</button>
+  <button class="tab" onclick="go('activity')">🏃 Vận động</button>
+  <button class="tab" onclick="go('nutrition')">🍎 Dinh dưỡng</button>
+  <button class="tab" onclick="go('sleep')">🌙 Ngủ</button>
+  <button class="tab" onclick="go('body')">⚖️ Cơ thể</button>
+  <button class="tab" onclick="go('remind')">⏰ Nhắc nhở</button>
+</div>
+
+<!-- HOME -->
+<div id="pg-home" class="pg on">
+  <div class="stats-grid">
+    <div class="stat g"><div class="stat-ico">👟</div><div class="stat-lbl">Bước chân</div><div class="stat-val g">7,240<span class="stat-unit"> bước</span></div><div class="prog"><div class="prog-fill g" style="width:72%"></div></div></div>
+    <div class="stat b"><div class="stat-ico">💧</div><div class="stat-lbl">Nước uống</div><div class="stat-val b" id="h-water">5<span class="stat-unit"> /8 ly</span></div><div class="prog"><div class="prog-fill b" id="h-wbar" style="width:62%"></div></div></div>
+    <div class="stat c"><div class="stat-ico">❤️</div><div class="stat-lbl">Nhịp tim</div><div class="stat-val c">72<span class="stat-unit"> bpm</span></div><div class="prog"><div class="prog-fill c" style="width:55%"></div></div></div>
+    <div class="stat a"><div class="stat-ico">🔥</div><div class="stat-lbl">Calo tiêu thụ</div><div class="stat-val a">1,450<span class="stat-unit"> kcal</span></div><div class="prog"><div class="prog-fill a" style="width:66%"></div></div></div>
+    <div class="stat p"><div class="stat-ico">🌙</div><div class="stat-lbl">Giấc ngủ</div><div class="stat-val p">7.5<span class="stat-unit"> giờ</span></div><div class="prog"><div class="prog-fill p" style="width:85%"></div></div></div>
+    <div class="stat pk"><div class="stat-ico">⚖️</div><div class="stat-lbl">% Mỡ</div><div class="stat-val pk">18.5<span class="stat-unit"> %</span></div><div class="prog"><div class="prog-fill pk" style="width:45%"></div></div></div>
+  </div>
+  <div class="card" style="margin-top:4px;">
+    <div class="card-hd"><span class="card-title">😊 Tâm trạng hôm nay</span><span class="pill g">Ghi nhận</span></div>
+    <div class="mood-row">
+      <div class="mood-opt" onclick="pickMood(this)"><span>😔</span><span class="mood-lbl">Tệ</span></div>
+      <div class="mood-opt" onclick="pickMood(this)"><span>😐</span><span class="mood-lbl">Bình</span></div>
+      <div class="mood-opt on" onclick="pickMood(this)"><span>😊</span><span class="mood-lbl">Tốt</span></div>
+      <div class="mood-opt" onclick="pickMood(this)"><span>😄</span><span class="mood-lbl">Tuyệt</span></div>
+      <div class="mood-opt" onclick="pickMood(this)"><span>🤩</span><span class="mood-lbl">Xuất sắc</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">📊 Bước chân 7 ngày</span><span class="pill a">tuần này</span></div>
+    <div class="bar-chart">
+      <div class="bar-col"><div class="bar" style="height:42px;background:#FAC775"></div><div class="bar-day">T2</div></div>
+      <div class="bar-col"><div class="bar" style="height:56px;background:#EF9F27"></div><div class="bar-day">T3</div></div>
+      <div class="bar-col"><div class="bar" style="height:35px;background:#FAC775"></div><div class="bar-day">T4</div></div>
+      <div class="bar-col"><div class="bar" style="height:52px;background:#EF9F27"></div><div class="bar-day">T5</div></div>
+      <div class="bar-col"><div class="bar" style="height:48px;background:#FAC775"></div><div class="bar-day">T6</div></div>
+      <div class="bar-col"><div class="bar" style="height:62px;background:#EF9F27"></div><div class="bar-day">T7</div></div>
+      <div class="bar-col"><div class="bar" style="height:48px;background:linear-gradient(135deg,#1D9E75,#378ADD)"></div><div class="bar-day td">CN</div></div>
+    </div>
+    <div style="font-size:11px;color:#aaa;font-weight:700;">Trung bình: 8,200 bước/ngày</div>
+  </div>
+</div>
+
+<!-- AI COACH -->
+<div id="pg-coach" class="pg">
+  <div class="coach-wrap">
+    <div class="coach-hdr">
+      <div class="coach-avi">🤖</div>
+      <div>
+        <div class="nm">HealthBot AI Coach</div>
+        <div class="st"><span class="dot"></span>Trực tuyến · Powered by Claude</div>
+      </div>
+    </div>
+    <div class="msgs" id="msgs">
+      <div class="msg ai">Xin chào! Mình là AI Coach sức khoẻ 💪<br><br>🥗 Gợi ý chế độ ăn Việt Nam<br>🏋️ Lên lịch tập luyện cá nhân<br>🔢 Tư vấn BMR & calo<br>😴 Cải thiện giấc ngủ<br>💡 Lời khuyên sức khoẻ hàng ngày<br><br>Hôm nay bạn muốn hỏi gì?</div>
+    </div>
+    <div class="qp-row">
+      <button class="qp-btn" onclick="qa('Hôm nay tôi nên ăn gì để giảm mỡ bụng?')">🥗 Gợi ý ăn gì</button>
+      <button class="qp-btn" onclick="qa('Lên lịch tập 3 ngày/tuần cho người mới bắt đầu')">🏃 Lịch tập</button>
+      <button class="qp-btn" onclick="qa('Tôi ngủ 7.5h nhưng vẫn mệt, cải thiện thế nào?')">😴 Cải thiện ngủ</button>
+      <button class="qp-btn" onclick="qa('Cách giảm stress nhanh sau giờ làm việc?')">🧘 Giảm stress</button>
+      <button class="qp-btn" onclick="qa('Tôi uống 5 ly nước hôm nay, đủ chưa?')">💧 Tư vấn nước</button>
+    </div>
+    <div class="coach-inp-row">
+      <input class="coach-inp" id="cinp" placeholder="Hỏi AI Coach bất cứ điều gì..." onkeydown="if(event.key==='Enter')send()"/>
+      <button class="send-btn" onclick="send()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- BMR -->
+<div id="pg-bmr" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">🔢 Tính BMR & TDEE</span><span class="pill g">Mifflin-St Jeor</span></div>
+    <div class="bmr-inputs">
+      <div class="field-wrap"><span class="field-lbl">Tuổi</span><input class="field-inp" id="f-age" type="number" value="30"/></div>
+      <div class="field-wrap"><span class="field-lbl">Giới tính</span><select class="field-sel" id="f-sex"><option value="m">Nam</option><option value="f">Nữ</option></select></div>
+      <div class="field-wrap"><span class="field-lbl">Cân nặng (kg)</span><input class="field-inp" id="f-w" type="number" value="68"/></div>
+      <div class="field-wrap"><span class="field-lbl">Chiều cao (cm)</span><input class="field-inp" id="f-h" type="number" value="170"/></div>
+    </div>
+    <div class="field-wrap" style="margin-bottom:12px;">
+      <span class="field-lbl">Mức độ vận động</span>
+      <select class="field-sel" id="f-act">
+        <option value="1.2">Ít vận động (ngồi văn phòng)</option>
+        <option value="1.375">Nhẹ (1–3 ngày/tuần)</option>
+        <option value="1.55" selected>Vừa phải (3–5 ngày/tuần)</option>
+        <option value="1.725">Nhiều (6–7 ngày/tuần)</option>
+        <option value="1.9">Rất nhiều (VĐV)</option>
+      </select>
+    </div>
+    <button class="calc-btn" onclick="calcBMR()">🔢 Tính ngay</button>
+    <div id="bmr-out" style="display:none">
+      <div class="bmr-result">
+        <div class="bmr-sub">BMR — Năng lượng cơ bản</div>
+        <div class="bmr-num" id="bmr-val">0</div>
+        <div class="bmr-sub">kcal/ngày</div>
+      </div>
+      <div class="bmr-grid">
+        <div class="bmr-cell"><div class="bmr-cell-val" id="tdee-v">0</div><div class="bmr-cell-lbl">TDEE (duy trì)</div></div>
+        <div class="bmr-cell"><div class="bmr-cell-val" id="cut-v">0</div><div class="bmr-cell-lbl">Giảm cân (-500)</div></div>
+        <div class="bmr-cell"><div class="bmr-cell-val" id="bulk-v">0</div><div class="bmr-cell-lbl">Tăng cân (+300)</div></div>
+      </div>
+      <div style="margin-top:12px;"><div style="font-size:13px;font-weight:900;margin-bottom:8px;">🥗 Phân chia Macro khuyến nghị</div>
+      <div class="bmr-grid">
+        <div class="bmr-cell" style="background:var(--bl)"><div class="bmr-cell-val" style="color:var(--bd)" id="carb-v">0g</div><div class="bmr-cell-lbl" style="color:var(--bd)">Carb 50%</div></div>
+        <div class="bmr-cell" style="background:var(--gl)"><div class="bmr-cell-val" style="color:var(--gd)" id="prot-v">0g</div><div class="bmr-cell-lbl" style="color:var(--gd)">Protein 25%</div></div>
+        <div class="bmr-cell" style="background:var(--al)"><div class="bmr-cell-val" style="color:var(--ad)" id="fat-v">0g</div><div class="bmr-cell-lbl" style="color:var(--ad)">Chất béo 25%</div></div>
+      </div></div>
+      <button class="calc-btn" style="margin-top:12px;" onclick="askBMR()">🤖 Hỏi AI Coach tư vấn thêm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITY -->
+<div id="pg-activity" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">💧 Uống nước hôm nay</span><span class="pill b" id="w-tag">5/8 ly</span></div>
+    <div class="cups" id="cups"></div>
+    <div style="font-size:11px;color:#aaa;margin-top:8px;font-weight:700;">Mỗi ly ≈ 250ml · Mục tiêu 2 lít/ngày</div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">🏃 Hoạt động hôm nay</span></div>
+    <div id="act-list">
+      <div class="act-item"><div class="act-ico" style="background:var(--gl)">🏃</div><div><div class="act-name">Chạy bộ sáng</div><div class="act-detail">30 phút · 3.5km</div></div><div class="act-cal">-280 kcal</div></div>
+      <div class="act-item"><div class="act-ico" style="background:var(--bl)">🧘</div><div><div class="act-name">Yoga tối</div><div class="act-detail">20 phút</div></div><div class="act-cal">-80 kcal</div></div>
+    </div>
+    <div class="inp-row"><input id="act-inp" placeholder="Nhập hoạt động mới..."/><button class="add-btn" onclick="addAct()">+ Thêm</button></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">❤️ Nhịp tim</span><span class="pill c">72 bpm · Bình thường</span></div>
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;text-align:center;padding:10px;background:var(--cl);border-radius:10px;"><div style="font-size:16px;font-weight:900;color:var(--cd)">58</div><div style="font-size:10px;color:var(--cd);font-weight:700">Thấp nhất</div></div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--cl);border-radius:10px;"><div style="font-size:16px;font-weight:900;color:var(--cd)">72</div><div style="font-size:10px;color:var(--cd);font-weight:700">Trung bình</div></div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--cl);border-radius:10px;"><div style="font-size:16px;font-weight:900;color:var(--cd)">95</div><div style="font-size:10px;color:var(--cd);font-weight:700">Cao nhất</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NUTRITION -->
+<div id="pg-nutrition" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">🔥 Calo hôm nay</span><span class="pill c">Mục tiêu: 2,200</span></div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <div><div style="font-size:38px;font-weight:900;color:var(--cd)">1,450<span style="font-size:14px"> kcal</span></div><div style="font-size:12px;color:#aaa;font-weight:700;margin-top:2px">Còn lại: 750 kcal</div></div>
+      <div style="position:relative;width:74px;height:74px;margin-left:auto">
+        <svg width="74" height="74" viewBox="0 0 74 74" style="transform:rotate(-90deg)">
+          <circle cx="37" cy="37" r="30" fill="none" stroke="var(--cl)" stroke-width="8"/>
+          <circle cx="37" cy="37" r="30" fill="none" stroke="var(--c)" stroke-width="8" stroke-dasharray="188.5" stroke-dashoffset="64" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:13px;font-weight:900;color:var(--cd)">66%</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+      <div style="flex:1;text-align:center;padding:9px;background:var(--bl);border-radius:10px"><div style="font-size:15px;font-weight:900;color:var(--bd)">145g</div><div style="font-size:10px;color:var(--bd);font-weight:700">Carb</div></div>
+      <div style="flex:1;text-align:center;padding:9px;background:var(--gl);border-radius:10px"><div style="font-size:15px;font-weight:900;color:var(--gd)">82g</div><div style="font-size:10px;color:var(--gd);font-weight:700">Protein</div></div>
+      <div style="flex:1;text-align:center;padding:9px;background:var(--al);border-radius:10px"><div style="font-size:15px;font-weight:900;color:var(--ad)">45g</div><div style="font-size:10px;color:var(--ad);font-weight:700">Chất béo</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">🍽️ Bữa ăn hôm nay</span></div>
+    <div id="meal-list">
+      <div class="act-item"><div class="act-ico" style="background:var(--al)">🌅</div><div><div class="act-name">Bữa sáng</div><div class="act-detail">Phở gà + trứng</div></div><div class="act-cal" style="color:var(--cd)">450 kcal</div></div>
+      <div class="act-item"><div class="act-ico" style="background:var(--gl)">☀️</div><div><div class="act-name">Bữa trưa</div><div class="act-detail">Cơm gà + rau xào</div></div><div class="act-cal" style="color:var(--cd)">680 kcal</div></div>
+      <div class="act-item"><div class="act-ico" style="background:var(--bl)">🍎</div><div><div class="act-name">Bữa phụ</div><div class="act-detail">Táo + sữa chua</div></div><div class="act-cal" style="color:var(--cd)">320 kcal</div></div>
+    </div>
+    <div class="inp-row"><input id="meal-inp" placeholder="Thêm bữa ăn..."/><button class="add-btn" onclick="addMeal()">+ Thêm</button></div>
+  </div>
+</div>
+
+<!-- SLEEP -->
+<div id="pg-sleep" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">🌙 Giấc ngủ tối qua</span><span class="pill p">Tốt</span></div>
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:44px;font-weight:900;color:var(--pd)">7<span style="font-size:18px">h</span>30<span style="font-size:18px">p</span></div>
+      <div style="font-size:12px;color:#aaa;font-weight:700">23:00 – 06:30</div>
+    </div>
+    <div class="sleep-stages">
+      <div class="stage" style="background:var(--pl)"><div class="stage-val" style="color:var(--pd)">2h15p</div><div class="stage-lbl" style="color:var(--pd)">Ngủ sâu</div></div>
+      <div class="stage" style="background:var(--bl)"><div class="stage-val" style="color:var(--bd)">1h45p</div><div class="stage-lbl" style="color:var(--bd)">REM</div></div>
+      <div class="stage" style="background:var(--gl)"><div class="stage-val" style="color:var(--gd)">3h30p</div><div class="stage-lbl" style="color:var(--gd)">Ngủ nhẹ</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">⏰ Mục tiêu giờ ngủ</span></div>
+    <div style="display:flex;gap:10px">
+      <div class="field-wrap" style="flex:1"><span class="field-lbl">Đi ngủ</span><input type="time" value="23:00" class="field-inp"/></div>
+      <div class="field-wrap" style="flex:1"><span class="field-lbl">Thức dậy</span><input type="time" value="06:30" class="field-inp"/></div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div id="pg-body" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">⚖️ Cân nặng & BMI</span><span class="pill g">Bình thường</span></div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div style="font-size:40px;font-weight:900;color:var(--gd)">68<span style="font-size:14px">kg</span></div>
+      <div><div style="font-size:12px;color:#aaa;font-weight:700">BMI</div><div style="font-size:22px;font-weight:900;color:var(--gd)">22.4</div><div style="font-size:11px;color:var(--g);font-weight:800">✓ Bình thường</div></div>
+    </div>
+    <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin:12px 0 6px">
+      <div style="flex:1.5;background:#B5D4F4"></div><div style="flex:2;background:#9FE1CB"></div><div style="flex:1.5;background:#FAC775"></div><div style="flex:1;background:#F0997B"></div>
+    </div>
+    <div class="inp-row"><input id="w-inp" type="number" placeholder="Nhập cân nặng mới (kg)" step="0.1"/><button class="add-btn" onclick="logW()">Ghi</button></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><span class="card-title">📉 % Mỡ cơ thể</span><span class="pill pk">Lý tưởng</span></div>
+    <div style="font-size:40px;font-weight:900;color:var(--pkd)">18.5<span style="font-size:14px">%</span></div>
+    <div style="height:6px;border-radius:3px;background:var(--pkl);margin-top:10px"><div style="width:52%;height:100%;background:linear-gradient(90deg,var(--pk),var(--p));border-radius:3px"></div></div>
+    <div style="font-size:11px;color:var(--pkd);font-weight:700;margin-top:6px">Nam lý tưởng: 10–20% · Anh đang rất ổn 👍</div>
+  </div>
+</div>
+
+<!-- REMINDERS -->
+<div id="pg-remind" class="pg">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">⏰ Nhắc nhở thông minh</span><span class="pill g">Android</span></div>
+    <div class="reminder"><span class="rem-ico">💧</span><div><div class="rem-title">Uống nước</div><div class="rem-time">Mỗi 2 giờ · 07:00–22:00</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
+    <div class="reminder"><span class="rem-ico">🏃</span><div><div class="rem-title">Nhắc tập thể dục</div><div class="rem-time">06:30 sáng hàng ngày</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
+    <div class="reminder"><span class="rem-ico">🌙</span><div><div class="rem-title">Giờ đi ngủ</div><div class="rem-time">22:30 tối hàng ngày</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
+    <div class="reminder"><span class="rem-ico">🍽️</span><div><div class="rem-title">Nhắc bữa ăn</div><div class="rem-time">07:00 · 12:00 · 18:30</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
+    <div class="reminder"><span class="rem-ico">⚖️</span><div><div class="rem-title">Cân buổi sáng</div><div class="rem-time">06:00 thứ 2, 4, 6</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
+    <div class="reminder"><span class="rem-ico">🧘</span><div><div class="rem-title">Thiền / thở sâu</div><div class="rem-time">12:00 trưa hàng ngày</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
+    <div style="margin-top:14px;padding:14px;background:var(--gl);border-radius:14px">
+      <div style="font-size:13px;font-weight:900;color:var(--gd);margin-bottom:6px">📱 Cài lên màn hình Android như app thật</div>
+      <div style="font-size:12px;color:var(--gd);line-height:1.7;font-weight:600">
+        1. Mở file này bằng Chrome trên Android<br>
+        2. Nhấn menu ⋮ → "Thêm vào màn hình chính"<br>
+        3. Đặt tên "HealthCoach" → Thêm<br>
+        4. App xuất hiện như icon thật trên màn hình! 🎉
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="bnav-btn on" onclick="go('home')"><span class="bnav-ico">🏠</span>Tổng quan</button>
+  <button class="bnav-btn" onclick="go('coach')"><span class="bnav-ico">🤖</span>AI Coach</button>
+  <button class="bnav-btn" onclick="go('activity')"><span class="bnav-ico">🏃</span>Vận động</button>
+  <button class="bnav-btn" onclick="go('nutrition')"><span class="bnav-ico">🍎</span>Dinh dưỡng</button>
+  <button class="bnav-btn" onclick="go('remind')"><span class="bnav-ico">⏰</span>Nhắc nhở</button>
+</div>
+
+</div>
+<script>
+const PAGES=['home','coach','bmr','activity','nutrition','sleep','body','remind'];
+const TABS=['home','coach','activity','nutrition','remind'];
+
+function go(p){
+  PAGES.forEach(n=>{const el=document.getElementById('pg-'+n);if(el)el.classList.toggle('on',n===p);});
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',PAGES[i]===p));
+  document.querySelectorAll('.bnav-btn').forEach((b,i)=>b.classList.toggle('on',TABS[i]===p));
+  window.scrollTo(0,0);
+}
+
+function pickMood(el){document.querySelectorAll('.mood-opt').forEach(m=>m.classList.remove('on'));el.classList.add('on');}
+
+let water=5;
+function renderCups(){
+  const c=document.getElementById('cups');if(!c)return;c.innerHTML='';
+  for(let i=0;i<8;i++){const d=document.createElement('div');d.className='cup'+(i<water?' on':'');d.onclick=()=>{water=i<water?i:i+1;renderCups();syncWater();};c.appendChild(d);}
+}
+function syncWater(){
+  const t=document.getElementById('w-tag');if(t)t.textContent=water+'/8 ly';
+  const h=document.getElementById('h-water');if(h)h.innerHTML=water+'<span class="stat-unit"> /8 ly</span>';
+  const b=document.getElementById('h-wbar');if(b)b.style.width=Math.round(water/8*100)+'%';
+}
+renderCups();
+
+function addAct(){const i=document.getElementById('act-inp');const v=i.value.trim();if(!v)return;const icos=['🏊','🚴','🤸','🏋️','⛹️'];const ic=icos[~~(Math.random()*icos.length)];const l=document.getElementById('act-list');const d=document.createElement('div');d.className='act-item';d.innerHTML=`<div class="act-ico" style="background:var(--gl)">${ic}</div><div><div class="act-name">${v}</div><div class="act-detail">Vừa thêm</div></div><div class="act-cal">? kcal</div>`;l.appendChild(d);i.value='';}
+function addMeal(){const i=document.getElementById('meal-inp');const v=i.value.trim();if(!v)return;const icos=['🍜','🍱','🥗','🍲','🥘'];const ic=icos[~~(Math.random()*icos.length)];const k=Math.round(Math.random()*350+150);const l=document.getElementById('meal-list');const d=document.createElement('div');d.className='act-item';d.innerHTML=`<div class="act-ico" style="background:var(--al)">${ic}</div><div><div class="act-name">${v}</div><div class="act-detail">Vừa thêm</div></div><div class="act-cal" style="color:var(--cd)">${k} kcal</div>`;l.appendChild(d);i.value='';}
+function logW(){const i=document.getElementById('w-inp');const v=parseFloat(i.value);if(!v||v<30||v>250)return;alert('✅ Đã ghi: '+v+' kg');i.value='';}
+function togR(btn){btn.classList.toggle('on');btn.classList.toggle('off');}
+
+function calcBMR(){
+  const age=parseInt(document.getElementById('f-age').value)||30;
+  const sex=document.getElementById('f-sex').value;
+  const w=parseFloat(document.getElementById('f-w').value)||68;
+  const h=parseFloat(document.getElementById('f-h').value)||170;
+  const act=parseFloat(document.getElementById('f-act').value)||1.55;
+  let bmr=sex==='m'?10*w+6.25*h-5*age+5:10*w+6.25*h-5*age-161;
+  bmr=Math.round(bmr);const tdee=Math.round(bmr*act);
+  document.getElementById('bmr-val').textContent=bmr;
+  document.getElementById('tdee-v').textContent=tdee;
+  document.getElementById('cut-v').textContent=tdee-500;
+  document.getElementById('bulk-v').textContent=tdee+300;
+  document.getElementById('carb-v').textContent=Math.round(tdee*.5/4)+'g';
+  document.getElementById('prot-v').textContent=Math.round(tdee*.25/4)+'g';
+  document.getElementById('fat-v').textContent=Math.round(tdee*.25/9)+'g';
+  document.getElementById('bmr-out').style.display='block';
+}
+function askBMR(){
+  const bmr=document.getElementById('bmr-val').textContent;
+  const tdee=document.getElementById('tdee-v').textContent;
+  go('coach');
+  setTimeout(()=>{document.getElementById('cinp').value=`BMR của tôi là ${bmr} kcal, TDEE là ${tdee} kcal. Tư vấn chế độ ăn và lịch tập để giảm mỡ tăng cơ nhé!`;send();},400);
+}
+
+let hist=[];
+async function send(){
+  const inp=document.getElementById('cinp');const q=inp.value.trim();if(!q)return;
+  inp.value='';addMsg(q,'user');hist.push({role:'user',content:q});
+  const typ=addTyping();
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:`Bạn là AI Health Coach chuyên nghiệp, thân thiện. Người dùng dùng app sức khoẻ Android tại Việt Nam.
+Dữ liệu: cân 68kg, cao 170cm, BMI 22.4, mỡ 18.5%, bước chân 7240, ngủ 7.5h, nhịp tim 72bpm, nước 5/8 ly.
+Trả lời tiếng Việt, ngắn gọn 3-5 câu, thực tế, dùng emoji. Gợi ý món ăn Việt Nam, bài tập tại nhà không cần dụng cụ.`,
+        messages:hist
+      })
+    });
+    const d=await r.json();typ.remove();
+    const rep=d.content?.[0]?.text||'Xin lỗi, thử lại nhé!';
+    hist.push({role:'assistant',content:rep});addMsg(rep,'ai');
+  }catch(e){typ.remove();addMsg('Lỗi kết nối 😅 Kiểm tra mạng và thử lại!','ai');}
+}
+function qa(q){document.getElementById('cinp').value=q;send();}
+function addMsg(txt,type){
+  const box=document.getElementById('msgs');const d=document.createElement('div');
+  d.className='msg '+type;d.innerHTML=txt.replace(/\n/g,'<br>');
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return d;
+}
+function addTyping(){
+  const box=document.getElementById('msgs');const d=document.createElement('div');
+  d.className='msg typing';d.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return d;
+}
+
+// Greeting
+const h=new Date().getHours();
+const g=document.getElementById('greeting');
+if(g){g.textContent=h<12?'Chào buổi sáng 🌤️':h<18?'Chào buổi chiều ☀️':'Chào buổi tối 🌙';}
+
+document.getElementById('cinp').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+</script>
+</body>
+</html>
