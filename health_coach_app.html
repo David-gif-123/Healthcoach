@@ -444,23 +444,50 @@ body{font-family:var(--fn);background:var(--bg);min-height:100vh;color:var(--txt
 
 <!-- REMINDERS -->
 <div id="pg-remind" class="pg">
+  <div id="notif-banner" style="display:none;background:var(--al);border-radius:14px;padding:14px;margin-bottom:10px;text-align:center;">
+    <div style="font-size:13px;font-weight:900;color:var(--ad);margin-bottom:8px;">🔔 Bật thông báo để nhận nhắc nhở thật!</div>
+    <button onclick="reqNotif()" style="padding:10px 20px;border-radius:10px;border:none;background:var(--a);color:white;font-size:13px;font-weight:900;cursor:pointer;">Bật thông báo ngay</button>
+  </div>
+  <div id="notif-ok" style="display:none;background:var(--gl);border-radius:14px;padding:10px 14px;margin-bottom:10px;">
+    <div style="font-size:12px;font-weight:800;color:var(--gd);">✅ Thông báo đã bật! Nhắc nhở sẽ hiện đúng giờ.</div>
+  </div>
   <div class="card">
-    <div class="card-hd"><span class="card-title">⏰ Nhắc nhở thông minh</span><span class="pill g">Android</span></div>
-    <div class="reminder"><span class="rem-ico">💧</span><div><div class="rem-title">Uống nước</div><div class="rem-time">Mỗi 2 giờ · 07:00–22:00</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
-    <div class="reminder"><span class="rem-ico">🏃</span><div><div class="rem-title">Nhắc tập thể dục</div><div class="rem-time">06:30 sáng hàng ngày</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
-    <div class="reminder"><span class="rem-ico">🌙</span><div><div class="rem-title">Giờ đi ngủ</div><div class="rem-time">22:30 tối hàng ngày</div></div><button class="rem-tog on" onclick="togR(this)"></button></div>
-    <div class="reminder"><span class="rem-ico">🍽️</span><div><div class="rem-title">Nhắc bữa ăn</div><div class="rem-time">07:00 · 12:00 · 18:30</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
-    <div class="reminder"><span class="rem-ico">⚖️</span><div><div class="rem-title">Cân buổi sáng</div><div class="rem-time">06:00 thứ 2, 4, 6</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
-    <div class="reminder"><span class="rem-ico">🧘</span><div><div class="rem-title">Thiền / thở sâu</div><div class="rem-time">12:00 trưa hàng ngày</div></div><button class="rem-tog off" onclick="togR(this)"></button></div>
-    <div style="margin-top:14px;padding:14px;background:var(--gl);border-radius:14px">
-      <div style="font-size:13px;font-weight:900;color:var(--gd);margin-bottom:6px">📱 Cài lên màn hình Android như app thật</div>
-      <div style="font-size:12px;color:var(--gd);line-height:1.7;font-weight:600">
-        1. Mở file này bằng Chrome trên Android<br>
-        2. Nhấn menu ⋮ → "Thêm vào màn hình chính"<br>
-        3. Đặt tên "HealthCoach" → Thêm<br>
-        4. App xuất hiện như icon thật trên màn hình! 🎉
-      </div>
+    <div class="card-hd"><span class="card-title">⏰ Nhắc nhở thông minh</span><span class="pill g" id="rem-count">0 đang bật</span></div>
+    <!-- Uống nước -->
+    <div class="reminder"><span class="rem-ico">💧</span><div style="flex:1"><div class="rem-title">Uống nước</div><div class="rem-time">Mỗi 2 giờ</div></div><button class="rem-tog on" onclick="togR(this,'water')"></button></div>
+    <div style="display:flex;gap:8px;margin:-4px 0 8px;padding:0 10px;">
+      <div style="flex:1"><div style="font-size:10px;color:#aaa;font-weight:700;margin-bottom:3px;">Từ giờ</div><input type="time" value="07:00" id="wt-start" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+      <div style="flex:1"><div style="font-size:10px;color:#aaa;font-weight:700;margin-bottom:3px;">Đến giờ</div><input type="time" value="22:00" id="wt-end" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
     </div>
+
+    <!-- Tập thể dục -->
+    <div class="reminder"><span class="rem-ico">🏃</span><div style="flex:1"><div class="rem-title">Tập thể dục</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog on" onclick="togR(this,'exercise')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="06:30" id="ex-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Đi ngủ -->
+    <div class="reminder"><span class="rem-ico">🌙</span><div style="flex:1"><div class="rem-title">Giờ đi ngủ</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog on" onclick="togR(this,'sleep2')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="22:30" id="sl-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Bữa sáng -->
+    <div class="reminder"><span class="rem-ico">🍽️</span><div style="flex:1"><div class="rem-title">Bữa sáng</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog off" onclick="togR(this,'breakfast')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="07:00" id="bf-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Bữa trưa -->
+    <div class="reminder"><span class="rem-ico">☀️</span><div style="flex:1"><div class="rem-title">Bữa trưa</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog off" onclick="togR(this,'lunch')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="12:00" id="lu-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Bữa tối -->
+    <div class="reminder"><span class="rem-ico">🌆</span><div style="flex:1"><div class="rem-title">Bữa tối</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog off" onclick="togR(this,'dinner')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="18:30" id="di-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Cân -->
+    <div class="reminder"><span class="rem-ico">⚖️</span><div style="flex:1"><div class="rem-title">Cân buổi sáng</div><div class="rem-time">Thứ 2, 4, 6</div></div><button class="rem-tog off" onclick="togR(this,'weight')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="06:00" id="wg-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+
+    <!-- Thiền -->
+    <div class="reminder"><span class="rem-ico">🧘</span><div style="flex:1"><div class="rem-title">Thiền / thở sâu</div><div class="rem-time">Hàng ngày</div></div><button class="rem-tog off" onclick="togR(this,'meditate')"></button></div>
+    <div style="margin:-4px 0 8px;padding:0 10px;"><input type="time" value="12:00" id="md-time" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid #e0e0e0;font-size:14px;font-weight:700;background:#f4f6f8;color:#111;"></div>
+    <button onclick="saveReminders()" style="width:100%;margin-top:12px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--g),var(--b));color:white;font-size:14px;font-weight:900;cursor:pointer;">💾 Lưu & Kích hoạt nhắc nhở</button>
   </div>
 </div>
 
@@ -502,7 +529,97 @@ renderCups();
 function addAct(){const i=document.getElementById('act-inp');const v=i.value.trim();if(!v)return;const icos=['🏊','🚴','🤸','🏋️','⛹️'];const ic=icos[~~(Math.random()*icos.length)];const l=document.getElementById('act-list');const d=document.createElement('div');d.className='act-item';d.innerHTML=`<div class="act-ico" style="background:var(--gl)">${ic}</div><div><div class="act-name">${v}</div><div class="act-detail">Vừa thêm</div></div><div class="act-cal">? kcal</div>`;l.appendChild(d);i.value='';}
 function addMeal(){const i=document.getElementById('meal-inp');const v=i.value.trim();if(!v)return;const icos=['🍜','🍱','🥗','🍲','🥘'];const ic=icos[~~(Math.random()*icos.length)];const k=Math.round(Math.random()*350+150);const l=document.getElementById('meal-list');const d=document.createElement('div');d.className='act-item';d.innerHTML=`<div class="act-ico" style="background:var(--al)">${ic}</div><div><div class="act-name">${v}</div><div class="act-detail">Vừa thêm</div></div><div class="act-cal" style="color:var(--cd)">${k} kcal</div>`;l.appendChild(d);i.value='';}
 function logW(){const i=document.getElementById('w-inp');const v=parseFloat(i.value);if(!v||v<30||v>250)return;alert('✅ Đã ghi: '+v+' kg');i.value='';}
-function togR(btn){btn.classList.toggle('on');btn.classList.toggle('off');}
+
+// Reminders system
+let remStates={water:true,exercise:true,sleep2:true,breakfast:false,lunch:false,dinner:false,weight:false,meditate:false};
+let notifTimers=[];
+
+function togR(btn,key){
+  btn.classList.toggle('on');btn.classList.toggle('off');
+  if(key)remStates[key]=btn.classList.contains('on');
+  updateRemCount();
+}
+function updateRemCount(){
+  const n=Object.values(remStates).filter(Boolean).length;
+  const el=document.getElementById('rem-count');if(el)el.textContent=n+' đang bật';
+}
+
+async function reqNotif(){
+  if(!('Notification' in window)){alert('Trình duyệt không hỗ trợ thông báo');return;}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){
+    document.getElementById('notif-banner').style.display='none';
+    document.getElementById('notif-ok').style.display='block';
+    new Notification('HealthCoach AI',{body:'Thông báo đã bật! 💪',icon:'https://david-gif-123.github.io/Healthcoach/health_coach_app.html'});
+  } else {
+    alert('Anh cần cho phép thông báo để nhận nhắc nhở nhé!');
+  }
+}
+
+function checkNotifStatus(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='granted'){
+    document.getElementById('notif-ok').style.display='block';
+  } else {
+    document.getElementById('notif-banner').style.display='block';
+  }
+}
+
+function sendNotif(title,body){
+  if(Notification.permission==='granted'){
+    new Notification(title,{body:body,icon:'https://david-gif-123.github.io/Healthcoach/health_coach_app.html',badge:'https://david-gif-123.github.io/Healthcoach/health_coach_app.html'});
+  }
+}
+
+function saveReminders(){
+  clearInterval(window._remInterval);
+  const msgs={
+    water:{title:'💧 Uống nước!',body:'Đã đến giờ uống nước rồi, đừng quên nhé!'},
+    exercise:{title:'🏃 Tập thể dục!',body:'Đến giờ vận động rồi anh ơi, cơ thể đang chờ!'},
+    sleep2:{title:'🌙 Giờ đi ngủ!',body:'Ngủ đủ giấc là chìa khoá sức khoẻ, nghỉ ngơi thôi!'},
+    breakfast:{title:'🍽️ Bữa sáng!',body:'Bữa sáng quan trọng lắm, nhớ ăn đầy đủ nhé!'},
+    lunch:{title:'☀️ Bữa trưa!',body:'Đến giờ ăn trưa rồi, nạp năng lượng thôi!'},
+    dinner:{title:'🌆 Bữa tối!',body:'Bữa tối đến rồi, nhớ ăn nhẹ thôi nhé!'},
+    weight:{title:'⚖️ Cân buổi sáng!',body:'Nhớ cân và ghi lại cân nặng hôm nay nhé!'},
+    meditate:{title:'🧘 Giờ thiền!',body:'Dừng lại thở sâu 5 phút, giảm stress hiệu quả lắm!'}
+  };
+  const times={
+    exercise:document.getElementById('ex-time').value,
+    sleep2:document.getElementById('sl-time').value,
+    breakfast:document.getElementById('bf-time').value,
+    lunch:document.getElementById('lu-time').value,
+    dinner:document.getElementById('di-time').value,
+    weight:document.getElementById('wg-time').value,
+    meditate:document.getElementById('md-time').value,
+  };
+  const waterStart=document.getElementById('wt-start').value;
+  const waterEnd=document.getElementById('wt-end').value;
+
+  window._remInterval=setInterval(()=>{
+    const now=new Date();
+    const hhmm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+    const day=now.getDay();
+
+    // Water: every 2 hours between start-end
+    if(remStates.water && now.getMinutes()===0){
+      if(hhmm>=waterStart && hhmm<=waterEnd && now.getHours()%2===0){
+        sendNotif(msgs.water.title,msgs.water.body);
+      }
+    }
+    // Weight: Mon, Wed, Fri only
+    if(remStates.weight && hhmm===times.weight && now.getMinutes()===0 && [1,3,5].includes(day)){
+      sendNotif(msgs.weight.title,msgs.weight.body);
+    }
+    // Others: daily
+    ['exercise','sleep2','breakfast','lunch','dinner','meditate'].forEach(k=>{
+      if(remStates[k] && times[k] && hhmm===times[k] && now.getMinutes()===0){
+        sendNotif(msgs[k].title,msgs[k].body);
+      }
+    });
+  },60000);
+
+  alert('✅ Đã lưu! Nhắc nhở sẽ hoạt động khi app đang mở.');
+}
 
 function calcBMR(){
   const age=parseInt(document.getElementById('f-age').value)||30;
@@ -544,6 +661,8 @@ function saveKey(){
   const v=document.getElementById('key-inp').value.trim();
   if(!v.startsWith('sk-ant-')){alert('Key không hợp lệ! Key phải bắt đầu bằng sk-ant-');return;}
   apiKey=v;localStorage.setItem('hc_key',v);checkKey();
+checkNotifStatus();
+updateRemCount();
 }
 function resetKey(){
   if(confirm('Xoá API key?')){apiKey='';localStorage.removeItem('hc_key');hist=[];checkKey();}
@@ -596,7 +715,8 @@ if(g){g.textContent=h<12?'Chào buổi sáng 🌤️':h<18?'Chào buổi chiều
 
 document.getElementById('cinp').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 checkKey();
+checkNotifStatus();
+updateRemCount();
 </script>
 </body>
 </html>
-
